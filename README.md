@@ -5,3 +5,5 @@ Sreevidya Sreekantham: srvidya@csu.fullerton.edu
 Vivian Truong: vtruong72@csu.fullerton.edu
 
 Loc Nguyen: lnguy121@csu.fullerton.edu
+
+xuzhihui@csu.fullerton.edu
