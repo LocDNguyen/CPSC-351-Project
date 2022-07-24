@@ -31,11 +31,11 @@ string recvFileName()
 	/* TODO: declare an instance of the fileNameMsg struct to be
 	 * used for holding the message received from the sender.
          */
-
+	fileNameMsg msg;
         /* TODO: Receive the file name using msgrcv() */
 	
 	/* TODO: return the received file name */
-	
+	fileName= msg.fileName
         return fileName;
 }
  /**
@@ -192,6 +192,6 @@ int main(int argc, char** argv)
 	/* TODO: Detach from shared memory segment, and deallocate shared memory 
 	 * and message queue (i.e. call cleanup) 
 	 */
-		
+	
 	return 0;
 }
