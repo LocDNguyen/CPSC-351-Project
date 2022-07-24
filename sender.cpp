@@ -164,7 +164,8 @@ unsigned long sendFile(const char* fileName)
 		}
 
 		/* TODO: count the number of bytes sent. */
-
+			numBytesSent+= sndMsg.size;
+		
 		/* TODO: Send a message to the receiver telling him that the data is ready
  		 * to be read (message of type SENDER_DATA_TYPE).
  		 */
@@ -200,15 +201,20 @@ void sendFileName(const char* fileName)
 	 * the maximum buffer size in the fileNameMsg
 	 * struct. If exceeds, then terminate with an error.
 	 */
+	if(fileNameSize> (sizeof(fileNameMsg)))
+	{
+		perror("Error, buffer size exceeds.");
+		exit(-1);
+	}
 
 	/* TODO: Create an instance of the struct representing the message
 	 * containing the name of the file.
 	 */
-
+	fileNameMsg msg;
 	/* TODO: Set the message type FILE_NAME_TRANSFER_TYPE */
-
+	msg.mtype = FILE_NAME_TRANSFER_TYPE;
 	/* TODO: Set the file name in the message */
-
+	
 	/* TODO: Send the message using msgsnd */
 }
 
