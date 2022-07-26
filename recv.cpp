@@ -34,7 +34,7 @@ string recvFileName()
 	fileNameMsg msg;
 	
         /* TODO: Receive the file name using msgrcv() */
-	recvFileNameStr.append("__recv");
+	
 	
 	/* TODO: return the received file name */
 	fileName= msg.fileName
