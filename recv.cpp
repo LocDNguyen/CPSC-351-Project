@@ -32,7 +32,9 @@ string recvFileName()
 	 * used for holding the message received from the sender.
          */
 	fileNameMsg msg;
+	
         /* TODO: Receive the file name using msgrcv() */
+	recvFileNameStr.append("__recv");
 	
 	/* TODO: return the received file name */
 	fileName= msg.fileName
@@ -155,10 +157,13 @@ unsigned long mainLoop(const char* fileName)
 void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 {
 	/* TODO: Detach from shared memory */
+	shmdt(sharedMemPtr);
 	
 	/* TODO: Deallocate the shared memory segment */
+	shmctl(shmid, IPC_RMID, NULL);
 	
 	/* TODO: Deallocate the message queue */
+	msgctl(msqid, IPC_RMID, NULL);
 }
 
 /**
