@@ -142,6 +142,7 @@ unsigned long mainLoop(const char* fileName)
 		if(msgSize != 0)
 		{
 			/* TODO: count the number of bytes received */
+			numBytesRecv += msgSize;
 
 			/* Save the shared memory to file */
 			if(fwrite(sharedMemPtr, sizeof(char), msgSize, fp) < 0)
@@ -217,6 +218,7 @@ int main(int argc, char** argv)
 	/* TODO: Detach from shared memory segment, and deallocate shared memory
 	 * and message queue (i.e. call cleanup)
 	 */
+	cleanUp(shmid, msqid, sharedMemPtr);
 
 	return 0;
 }
