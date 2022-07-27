@@ -51,7 +51,7 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 	}
 
 	// TODO: Attach to the message queue
-	msqid = msgget(key, IPC_CREAT);
+	msqid = msgget(key, IPC_CREAT | 0777);
 	if (msqid == -1)
 	{
 		perror("msgget");
