@@ -129,10 +129,22 @@ unsigned long sendFile(const char* fileName)
 		/* TODO: Send a message to the receiver telling him that the data is ready
  		 * to be read (message of type SENDER_DATA_TYPE).
  		 */
+		sent = msgsnd(msqid, &sndMsg, (sizeof(message) - sizeof(long)), 0); // Why isn't "message" glowing mint?
+ 		if (sent == -1)
+ 		{
+ 			perror("msgsnd");
+ 			exit(1);
+ 		}
 
 		/* TODO: Wait until the receiver sends us a message of type RECV_DONE_TYPE telling us
  		 * that he finished saving a chunk of memory.
  		 */
+		receive = msgrcv(msqid, &rcvMsg, (sizeof(message) - sizeof(long)), RECV_DONE_TYPE, 0); // Why isn't "message" glowing mint?
+		if (receive == -1)
+		{
+  		perror("msgrcv");
+  		exit(1);
+  	}
 	}
 
 
@@ -140,6 +152,14 @@ unsigned long sendFile(const char* fileName)
  	  * Lets tell the receiver that we have nothing more to send. We will do this by
  	  * sending a message of type SENDER_DATA_TYPE with size field set to 0.
 	  */
+	sndMsg.size = 0;
+
+	sent = msgsnd(msqid, &sndMsg, (sizeof(message) - sizeof(long)), 0); // Why isn't "message" glowing mint?
+	if (sent == -1)
+	{
+		perror("msgsnd");
+		exit(1);
+	}
 
 
 	/* Close the file */
