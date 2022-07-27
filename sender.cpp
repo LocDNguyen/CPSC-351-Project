@@ -214,6 +214,7 @@ void sendFileName(const char* fileName)
 	/* TODO: Set the message type FILE_NAME_TRANSFER_TYPE */
 	msg.mtype = FILE_NAME_TRANSFER_TYPE;
 	/* TODO: Set the file name in the message */
+	strncpy(msg.fileName, fileName, fileNameSize + 1);
 	
 	/* TODO: Send the message using msgsnd */
 }
