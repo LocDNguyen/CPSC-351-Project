@@ -33,11 +33,19 @@ string recvFileName()
          */
 	fileNameMsg msg;
 
-        /* TODO: Receive the file name using msgrcv() */
+	// variable for receiving message
+	int receive = 0;
 
+  /* TODO: Receive the file name using msgrcv() */
+	/*receive = msgrcv(msqid, &msg, (sizeof(message) - sizeof(char)), RECV_DONE_TYPE, 0); // Why isn't "message" glowing mint?
+	if (receive == -1)
+	{
+		perror("msgrcv");
+		exit(1);
+	}*/
 
 	/* TODO: return the received file name */
-	fileName = msg.fileName
+	fileName = msg.fileName;
   return fileName;
 }
  /**
