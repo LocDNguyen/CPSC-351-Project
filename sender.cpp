@@ -51,7 +51,7 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 	}
 
 	// TODO: Attach to the message queue
-	msqid = msgget(key, IPC_CREAT | 0777);
+	msqid = msgget(key, IPC_CREAT);
 	if (msqid == -1)
 	{
 		perror("msgget");
@@ -202,7 +202,7 @@ void sendFileName(const char* fileName)
 	strncpy(msg.fileName, fileName, fileNameSize + 1);
 
 	/* TODO: Send the message using msgsnd */
-	sent = msgsnd(msqid, &msg, (sizeof(msg) - sizeof(char)), 0); // Why isn't "msg" glowing mint?
+	sent = msgsnd(msqid, &msg, (sizeof(fileNameMsg) - sizeof(char)), 0); // Why isn't "fileNameMsg" glowing mint?
 	if (sent == -1)
 	{
 		perror("msgsnd");
