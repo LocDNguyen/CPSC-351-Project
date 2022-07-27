@@ -177,26 +177,37 @@ void sendFileName(const char* fileName)
 	/* Get the length of the file name */
 	int fileNameSize = strlen(fileName);
 
+	// variable for sending message
+	int sent = 0;
+
 	/* TODO: Make sure the file name does not exceed
 	 * the maximum buffer size in the fileNameMsg
 	 * struct. If exceeds, then terminate with an error.
 	 */
-	if(fileNameSize> (sizeof(fileNameMsg)))
+	if(fileNameSize > (sizeof(fileNameMsg)))
 	{
 		perror("Error, buffer size exceeds.");
-		exit(-1);
+		exit(1);
 	}
 
 	/* TODO: Create an instance of the struct representing the message
 	 * containing the name of the file.
 	 */
 	fileNameMsg msg;
+
 	/* TODO: Set the message type FILE_NAME_TRANSFER_TYPE */
 	msg.mtype = FILE_NAME_TRANSFER_TYPE;
+
 	/* TODO: Set the file name in the message */
 	strncpy(msg.fileName, fileName, fileNameSize + 1);
 
 	/* TODO: Send the message using msgsnd */
+	sent = msgsnd(msqid, &msg, (sizeof(msg) - sizeof(char)), 0); // Why isn't "msg" glowing mint?
+	if (sent == -1)
+	{
+		perror("msgsnd");
+		exit(1);
+	}
 }
 
 
