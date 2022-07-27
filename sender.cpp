@@ -26,30 +26,6 @@ void* sharedMemPtr;
  */
 void init(int& shmid, int& msqid, void*& sharedMemPtr)
 {
-
-	/* Create a file called keyfile.txt containing string "Hello world" (you may do
-	so manually or from the code). */
-	string filename = "keyfile.txt";
-	fstream lookingForFile;
-
-	lookingForFile.open(filename, std::fstream::in | std::fstream::out);
-
-	// If file does not exist, Create new file
-	if (!lookingForFile)
-	{
-		cout << filename << " not found. Creating " << filename << ".";
-
-		lookingForFile.open(filename,  fstream::in | fstream::out | fstream::app);
-		lookingForFile << "Hello World";
-		lookingForFile.close();
-	}
-	else
-	{
-		cout << filename << " found.\n";
-		lookingForFile.close();
-		cout << "\n";
-	}
-
 	// Use ftok("keyfile.txt", 'a') in order to generate the key.
 	key_t key = ftok("keyfile.txt", 'a');
 	if (key == -1)
@@ -59,7 +35,7 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 	}
 
 	// TODO: Get the id of the shared memory segment. The size of the segment must be SHARED_MEMORY_CHUNK_SIZE
-	shmid = shmget(key, SHARED_MEMORY_CHUNK_SIZE, IPC_CREAT);
+	shmid = shmget(key, SHARED_MEMORY_CHUNK_SIZE, IPC_CREAT | 0777);
 	if (shmid == -1)
 	{
 		perror("shmget");
@@ -84,26 +60,6 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 
 	// Store the IDs and the pointer to the shared memory region in the corresponding function parameters?
 
-
-
-	/* TODO:
-  DONE 1. Create a file called keyfile.txt containing string "Hello world" (you may do
- 				so manually or from the code).
-	DONE 2. Use ftok("keyfile.txt", 'a') in order to generate the key.
-	3. You will use this key in the TODO's below. Use the same key for the queue
-	   and the shared memory segment. This also serves to illustrate the difference
- 	   between the key and the id used in message queues and shared memory. The key is
-	   like the file name and the id is like the file object.  Every System V object
-	   on the system has a unique id, but different objects may have the same key.
-	*/
-
-
-
-	/* TODO: Get the id of the shared memory segment. The size of the segment must be SHARED_MEMORY_CHUNK_SIZE */
-	/* TODO: Attach to the shared memory */
-	/* TODO: Attach to the message queue */
-	/* Store the IDs and the pointer to the shared memory region in the corresponding function parameters */
-
 }
 
 /**
@@ -116,10 +72,6 @@ void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 {
 	// Detach from shared memory
 	shmdt(sharedMemPtr);
-
-	/*shmctl(shmid, IPC_RMID, NULL);
-
-	msgctl(msqid, IPC_RMID, NULL);*/
 }
 
 /**
@@ -132,12 +84,20 @@ unsigned long sendFile(const char* fileName)
 
 	/* A buffer to store message we will send to the receiver. */
 	message sndMsg;
+	sndMsg.mtype = SENDER_DATA_TYPE;
 
 	/* A buffer to store message received from the receiver. */
 	ackMessage rcvMsg;
+	rcvMsg.mtype = RECV_DONE_TYPE;
 
 	/* The number of bytes sent */
 	unsigned long numBytesSent = 0;
+
+	// variable for sending message
+	int sent = 0;
+
+	// variable for receiving message
+	int receive = 0;
 
 	/* Open the file */
 	FILE* fp =  fopen(fileName, "r");
@@ -164,8 +124,8 @@ unsigned long sendFile(const char* fileName)
 		}
 
 		/* TODO: count the number of bytes sent. */
-			numBytesSent+= sndMsg.size;
-		
+		numBytesSent += sndMsg.size;
+
 		/* TODO: Send a message to the receiver telling him that the data is ready
  		 * to be read (message of type SENDER_DATA_TYPE).
  		 */
@@ -215,7 +175,7 @@ void sendFileName(const char* fileName)
 	msg.mtype = FILE_NAME_TRANSFER_TYPE;
 	/* TODO: Set the file name in the message */
 	strncpy(msg.fileName, fileName, fileNameSize + 1);
-	
+
 	/* TODO: Send the message using msgsnd */
 }
 
