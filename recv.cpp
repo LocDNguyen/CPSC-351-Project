@@ -155,6 +155,16 @@ unsigned long mainLoop(const char* fileName)
  			 * I.e., send a message of type RECV_DONE_TYPE. That is, a message
 			 * of type ackMessage with mtype field set to RECV_DONE_TYPE.
  			 */
+			ackMessage msg;
+			msg.mtype = RECV_DONE_TYPE;
+			msg.size = msgSize;
+			if(msgsnd(msqid, &msg, sizeof(msg) - sizeof(long), 0) < 0)
+			{
+				perror("msgsnd");
+				exit(1);
+			}
+			
+		}
 		}
 		/* We are done */
 		else
