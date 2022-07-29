@@ -37,12 +37,16 @@ Navigate to the directory of the project
 Compile sender.cpp by typing "g++ sender.cpp -o sender" into the terminal
 
 Run by typing in ./sender keyfile.txt
+![1code](https://user-images.githubusercontent.com/47013008/181816267-e60b22a8-6c8a-4cdd-8adf-9b6486f79607.png)
+
 
 Open a second terminal
 
 Compile recv.cpp by typing "g++ recv.cpp -o recv" into the terminal
 
 Run by typing in ./recv
+![2code](https://user-images.githubusercontent.com/47013008/181816380-d98da7ae-b291-4086-aa08-44d254446340.png)
+
 
 If everything worked, a new file with a __recv attached to it will appear
 
