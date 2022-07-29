@@ -34,7 +34,7 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 		exit(1);
 	}
 
-	// TODO: Get the id of the shared memory segment. The size of the segment must be SHARED_MEMORY_CHUNK_SIZE
+	// Get the id of the shared memory segment. The size of the segment must be SHARED_MEMORY_CHUNK_SIZE
 	shmid = shmget(key, SHARED_MEMORY_CHUNK_SIZE, IPC_CREAT | 0777);
 	if (shmid == -1)
 	{
@@ -42,7 +42,7 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 		exit(1);
 	}
 
-	// TODO: Attach to the shared memory
+	// Attach to the shared memory
 	sharedMemPtr = (char*)shmat(shmid, NULL, 0);
 	if (sharedMemPtr == (char*)(-1))
 	{
@@ -50,7 +50,7 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 		exit(1);
 	}
 
-	// TODO: Attach to the message queue
+	// Attach to the message queue
 	msqid = msgget(key, IPC_CREAT | 0777);
 	if (msqid == -1)
 	{
@@ -70,7 +70,7 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
  */
 void cleanUp(const int& shmid, const int& msqid, void* sharedMemPtr)
 {
-	// Detach from shared memory
+	// Detach from shared memory b/c recv.cpp will take care of deallocating the message queue and shared memory segment
 	shmdt(sharedMemPtr);
 }
 
@@ -123,12 +123,11 @@ unsigned long sendFile(const char* fileName)
 			exit(-1);
 		}
 
-		/* TODO: count the number of bytes sent. */
+		// Count the number of bytes sent.
 		numBytesSent += sndMsg.size;
 
-		/* TODO: Send a message to the receiver telling him that the data is ready
- 		 * to be read (message of type SENDER_DATA_TYPE).
- 		 */
+		/* Send a message to the receiver telling him that the data is ready
+ 		 * to be read (message of type SENDER_DATA_TYPE). */
 		sent = msgsnd(msqid, &sndMsg, (sizeof(message) - sizeof(long)), 0); // Why isn't "message" glowing mint?
  		if (sent == -1)
  		{
@@ -136,9 +135,8 @@ unsigned long sendFile(const char* fileName)
  			exit(1);
  		}
 
-		/* TODO: Wait until the receiver sends us a message of type RECV_DONE_TYPE telling us
- 		 * that he finished saving a chunk of memory.
- 		 */
+		/* Wait until the receiver sends us a message of type RECV_DONE_TYPE telling us
+ 		 * that he finished saving a chunk of memory. */
 		receive = msgrcv(msqid, &rcvMsg, (sizeof(message) - sizeof(long)), RECV_DONE_TYPE, 0); // Why isn't "message" glowing mint?
 		if (receive == -1)
 		{
@@ -148,10 +146,9 @@ unsigned long sendFile(const char* fileName)
 	}
 
 
-	/** TODO: once we are out of the above loop, we have finished sending the file.
+	/** Once we are out of the above loop, we have finished sending the file.
  	  * Lets tell the receiver that we have nothing more to send. We will do this by
- 	  * sending a message of type SENDER_DATA_TYPE with size field set to 0.
-	  */
+ 	  * sending a message of type SENDER_DATA_TYPE with size field set to 0. */
 	sndMsg.size = 0;
 
 	sent = msgsnd(msqid, &sndMsg, (sizeof(message) - sizeof(long)), 0); // Why isn't "message" glowing mint?
@@ -180,28 +177,26 @@ void sendFileName(const char* fileName)
 	// variable for sending message
 	int sent = 0;
 
-	/* TODO: Make sure the file name does not exceed
+	/* Make sure the file name does not exceed
 	 * the maximum buffer size in the fileNameMsg
-	 * struct. If exceeds, then terminate with an error.
-	 */
+	 * struct. If exceeds, then terminate with an error. */
 	if(fileNameSize > (sizeof(fileNameMsg)))
 	{
 		perror("Error, buffer size exceeds.");
 		exit(1);
 	}
 
-	/* TODO: Create an instance of the struct representing the message
-	 * containing the name of the file.
-	 */
+	/* Create an instance of the struct representing the message
+	 * containing the name of the file. */
 	fileNameMsg msg;
 
-	/* TODO: Set the message type FILE_NAME_TRANSFER_TYPE */
+	// Set the message type FILE_NAME_TRANSFER_TYPE
 	msg.mtype = FILE_NAME_TRANSFER_TYPE;
 
-	/* TODO: Set the file name in the message */
+	// Set the file name in the message
 	strncpy(msg.fileName, fileName, fileNameSize + 1);
 
-	/* TODO: Send the message using msgsnd */
+	// Send the message using msgsnd
 	sent = msgsnd(msqid, &msg, (sizeof(fileNameMsg) - sizeof(char)), 0); // Why isn't "fileNameMsg" glowing mint?
 	if (sent == -1)
 	{

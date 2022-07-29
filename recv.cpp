@@ -7,6 +7,8 @@
 #include <string>
 #include "msg.h"    /* For the message struct */
 
+#include <fstream>
+#include <iostream>
 using namespace std;
 
 /* The size of the shared memory segment */
@@ -28,23 +30,22 @@ string recvFileName()
 	/* The file name received from the sender */
 	string fileName;
 
-	/* TODO: declare an instance of the fileNameMsg struct to be
-	 * used for holding the message received from the sender.
-         */
+	/* Declare an instance of the fileNameMsg struct to be
+	 * used for holding the message received from the sender. */
 	fileNameMsg msg;
 
 	// variable for receiving message
 	int receive = 0;
 
-  /* TODO: Receive the file name using msgrcv() */
-	/*receive = msgrcv(msqid, &msg, (sizeof(message) - sizeof(char)), RECV_DONE_TYPE, 0); // Why isn't "message" glowing mint?
+  // Receive the file name using msgrcv()
+	receive = msgrcv(msqid, &msg, (sizeof(fileNameMsg) - sizeof(char)), FILE_NAME_TRANSFER_TYPE, 0);
 	if (receive == -1)
 	{
 		perror("msgrcv");
 		exit(1);
-	}*/
+	}
 
-	/* TODO: return the received file name */
+	// Return the received file name
 	fileName = msg.fileName;
   return fileName;
 }
@@ -73,13 +74,12 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 	}
 
 	// Attach to the shared memory
-	sharedMemPtr = (*char)shmat(shmid, NULL, 0);
+	sharedMemPtr = (char*)shmat(shmid, NULL, 0);
 	if (sharedMemPtr == (char*)(-1))
 	{
 		perror("shmat");
 		exit(1);
 	}
-
 	// Attach to the message queue (maybe no IPC_CREAT because we've could leave it up to the sender.cpp to create the message queue, and recv.cpp will return an error if he hasn't done so)
 	msqid = msgget(key, 0777);
 	if (msqid == -1)
@@ -87,7 +87,6 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
 		perror("msgget");
 		exit(1);
 	}
-
 }
 
 
@@ -98,8 +97,25 @@ void init(int& shmid, int& msqid, void*& sharedMemPtr)
  */
 unsigned long mainLoop(const char* fileName)
 {
+	/* A buffer to store message we will send to the receiver. */
+	message sndMsg;
+	sndMsg.mtype = SENDER_DATA_TYPE;
+
+	/* A buffer to store message received from the receiver. */
+	ackMessage rcvMsg;
+	rcvMsg.mtype = RECV_DONE_TYPE;
+
+	/* The number of bytes sent */
+	unsigned long numBytesSent = 0;
+
+	// variable for sending message
+	int sent = 0;
+
+	// variable for receiving message
+	int receive = 0;
+
 	/* The size of the message received from the sender */
-	int msgSize = -1;
+	sndMsg.size = -1;
 
 	/* The number of bytes received */
 	int numBytesRecv = 0;
@@ -107,7 +123,7 @@ unsigned long mainLoop(const char* fileName)
 	/* The string representing the file name received from the sender */
 	string recvFileNameStr = fileName;
 
-	/* TODO: append __recv to the end of file name */
+	// Append __recv to the end of file name
 	recvFileNameStr.append("__recv");
 
 	/* Open the file for writing */
@@ -124,10 +140,10 @@ unsigned long mainLoop(const char* fileName)
 	/* Keep receiving until the sender sets the size to 0, indicating that
  	 * there is no more data to send.
  	 */
-	while(msgSize != 0)
+	while(sndMsg.size != 0)
 	{
 
-		/* TODO: Receive the message and get the value of the size field. The message will be of
+		/* Receive the message and get the value of the size field. The message will be of
 		 * of type SENDER_DATA_TYPE. That is, a message that is an instance of the message struct with
 		 * mtype field set to SENDER_DATA_TYPE (the macro SENDER_DATA_TYPE is defined in
 		 * msg.h).  If the size field of the message is not 0, then we copy that many bytes from
@@ -138,23 +154,29 @@ unsigned long mainLoop(const char* fileName)
 		 * <ORIGINAL FILENAME__recv>. For example, if the name of the original
 		 * file is song.mp3, the name of the received file is going to be song.mp3__recv.
 		 */
-
-		/* If the sender is not telling us that we are done, then get to work */
-		if(msgSize != 0)
+		receive = msgrcv(msqid, &sndMsg, (sizeof(message) - sizeof(long)), SENDER_DATA_TYPE, 0);
+		if (receive == -1)
 		{
-			/* TODO: count the number of bytes received */
-			numBytesRecv += msgSize;
+			perror("msgrcv");
+			exit(1);
+		}
+		/* If the sender is not telling us that we are done, then get to work */
+		if(sndMsg.size != 0)
+		{
+			/* Count the number of bytes received */
+			numBytesRecv += sndMsg.size;
 
 			/* Save the shared memory to file */
-			if(fwrite(sharedMemPtr, sizeof(char), msgSize, fp) < 0)
+			if(fwrite(sharedMemPtr, sizeof(char), sndMsg.size, fp) < 0)
 			{
 				perror("fwrite");
 			}
 
-			/* TODO: Tell the sender that we are ready for the next set of bytes.
+			/* Tell the sender that we are ready for the next set of bytes.
  			 * I.e., send a message of type RECV_DONE_TYPE. That is, a message
 			 * of type ackMessage with mtype field set to RECV_DONE_TYPE.
  			 */
+<<<<<<< HEAD
 			ackMessage msg;
 			msg.mtype = RECV_DONE_TYPE;
 			msg.size = msgSize;
@@ -165,6 +187,14 @@ unsigned long mainLoop(const char* fileName)
 			}
 			
 		}
+=======
+			sent = msgsnd(msqid, &rcvMsg, (sizeof(ackMessage) - sizeof(long)), 0);
+			if (receive == -1)
+			{
+				perror("msgrcv");
+				exit(1);
+			}
+>>>>>>> 9ce45d2 (finished last todos and cleaned up code)
 		}
 		/* We are done */
 		else
@@ -210,7 +240,7 @@ void ctrlCSignal(int signal)
 int main(int argc, char** argv)
 {
 
-	/* TODO: Install a signal handler (see signaldemo.cpp sample file).
+	/* Install a signal handler (see signaldemo.cpp sample file).
  	 * If user presses Ctrl-c, your program should delete the message
  	 * queue and the shared memory segment before exiting. You may add
 	 * the cleaning functionality in ctrlCSignal().
@@ -221,12 +251,13 @@ int main(int argc, char** argv)
 	init(shmid, msqid, sharedMemPtr);
 
 	/* Receive the file name from the sender */
+
 	string fileName = recvFileName();
 
 	/* Go to the main loop */
 	fprintf(stderr, "The number of bytes received is: %lu\n", mainLoop(fileName.c_str()));
 
-	/* TODO: Detach from shared memory segment, and deallocate shared memory
+	/* Detach from shared memory segment, and deallocate shared memory
 	 * and message queue (i.e. call cleanup)
 	 */
 	cleanUp(shmid, msqid, sharedMemPtr);
