@@ -9,7 +9,7 @@
 #include <fstream>
 #include <iostream>
 using namespace std;
-
+// test git pull 
 /* The size of the shared memory segment */
 #define SHARED_MEMORY_CHUNK_SIZE 1000
 
