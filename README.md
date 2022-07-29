@@ -1,29 +1,13 @@
 # CPSC-351-Project/Summer 2022 CPSC 351-01 10597
 
-# Authors and what each member worked on
+# Authors
 Sreevidya Sreekantham: srvidya@csu.fullerton.edu
-
-sendFile function
-
-sendFileName function
 
 Vivian Truong: vtruong72@csu.fullerton.edu
 
-void init
-
-cleanup function
-
 Loc Nguyen: lnguy121@csu.fullerton.edu
 
-recvFileName function
-
-mainloop function
-
 xuzhihui: xuzhihui@csu.fullerton.edu
-
-main function
-
-helped with other functions as well (ie, sendFile, recvFileName)
 
 # How to run
 Clone the repository to your computer
@@ -59,3 +43,5 @@ If everything worked, a new file with a __recv attached to it will appear
 We coded everything in C++
 
 We tested this on Fedora 36
+
+Everyone contributed in every aspect of the code b/c we were working on all of the parts together.
