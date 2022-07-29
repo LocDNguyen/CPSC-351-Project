@@ -46,6 +46,9 @@ Run by typing in ./recv
 
 If everything worked, a new file with a __recv attached to it will appear
 
+![files that were send](https://user-images.githubusercontent.com/47013008/181816116-1e723657-75e9-4e58-a435-74c323e60751.png)
+
+
 
 
 # Details
