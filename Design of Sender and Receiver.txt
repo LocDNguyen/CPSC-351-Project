@@ -1,0 +1,28 @@
+Design of Sender and Receiver
+
+Sender.cpp…
+-First generates a key using the ftok() function
+-Then it allocates a shared memory region using the shmget() function.
+-After that it accesses the shared memory region
+-It also creates a message queue with the key that was generated
+-Creates a message buffer structure and populates it
+-Opens up the file to be read
+-While it is reading the file, send a message to the queue telling the receiver that the data is ready to be read
+-Then wait for the receiver to send us a message to tell us that the receiver has finished saving a chunk of memory
+-Once we have nothing else to send, send a message telling the receiver we have nothing else to send
+-Close the file
+-Detach from shared memory
+
+
+Recv.cpp…
+-First key is generated using ftok() function. Use the same key for the message queue and shared memory segment.
+-Allocate a shared memory segment
+-Store IDs and pointer to the shared memory region in shmid, and msqid parameters
+-Gets the handle of the message queue
+-Gets the id of message queue with the key value
+-Declares the message buffer in order to store the received message. Same message buffer is used as sender.
+-In order to retrieve the message from the queue, mtype must match the message of the sender.
+-Retrieve the file name and create a new file with the same name with an appended descriptor
+-Retrieve the message from the queue until it is sent a message size of 0
+-Count number of bytes received and communicate with sender when ready for next set of bytes
+-Detach from shared memory, deallocate the message queue and the shared memory segment
